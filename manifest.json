@@ -1,0 +1,16 @@
+{
+  "name": "Life in the UK",
+  "short_name": "LITU",
+  "icons": [
+    {
+      "src": "./icon_480.png",
+      "sizes": "480x480",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#000000"
+}
