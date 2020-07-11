@@ -1,3 +1,9 @@
 # Life in the UK practice
 
-_All the questions were found on various GitHub repositories. I decline all responsabilities in the use of this app._
+> No trackers,
+> No ads,
+> Free.
+
+More than 3000 questions from various sources. Many with extra tip to have a better understanding of your mistakes.
+
+Go try the [Life in the UK test](https://maxwellito.github.io/litu/)
