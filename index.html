@@ -106,7 +106,7 @@
     <div id="intro">
       <h1>Life in the UK.</h1>
       <p >
-        This test contains more than 3000 questions. The questions are now stored on your browser cache so you can keep playing offline.</br>
+        This test contains more than 2800 questions. The questions are now stored on your browser cache so you can keep playing offline.</br>
         Each test is made of 24 questions randomly choosen, you must have 75% success to pass.</br>
         Good luck.
       </p>
@@ -181,7 +181,7 @@
           .map((o, i) => [o, q.answers.includes(i)])
           .map(
             ([a, isGood]) => `<label class="${isGood ? 'good' : 'bad'}">
-              <input type="checkbox" value="${a}" onchange="inputChange(this)" class="${
+              <input type="checkbox" value="${a}" onchange="inputChange(event)" class="${
               isGood ? 'good' : 'bad'
             }"/>
               <span>${a}</span>
@@ -196,10 +196,15 @@
         `;
       }
 
-      function inputChange() {
+      function inputChange(event) {
+        if (!currentQuestion) {
+          event.currentTarget.checked = !event.currentTarget.checked;
+          return false;
+        }
         let checked = 0;
         let isRight = true;
-        Array.from(form.querySelectorAll('input')).forEach((x) => {
+        let inputs = Array.from(form.querySelectorAll('input'));
+        inputs.forEach((x) => {
           if (x.checked) {
             checked++;
           }
@@ -228,6 +233,7 @@
         if (wasGood) {
           quizGoodAnswers++;
         }
+        currentQuestion = null;
         form.classList.add('reveal');
         progress.style.width = `${((quizIndex + 1) / 24) * 100}%`;
       }
