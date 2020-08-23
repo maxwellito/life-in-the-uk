@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>Life in the UK</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -15,7 +15,6 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui"
     />
-
     <meta name="msapplication-TileImage" content="icon_480.png" />
     <meta name="msapplication-TileColor" content="#000000" />
     <style>
@@ -69,17 +68,19 @@
       form.reveal .tip {
         display: block;
       }
+      .actions {
+        text-align: center;
+        margin: 1em auto;
+      }
       button {
-        display: block;
         font-size: 1.5rem;
         background: #222;
         border: none;
         color: #fff;
-        padding: 0.25em 2em;
-        margin: 1em auto;
+        padding: 0.25em 1.5em;
+        margin: .125em 0;
         font-weight: bold;
       }
-
 
       .hide {
         display: none;
@@ -93,6 +94,7 @@
       svg circle#summary-circle {
         stroke-dasharray: 289;
         stroke-dashoffset: 289;
+        stroke-linejoin: round;
         transition: 1s all ease;
       }
     </style>
@@ -105,16 +107,22 @@
     <!-- form INTERFACE -->
     <div id="intro">
       <h1>Life in the UK.</h1>
-      <p >
-        This test contains more than 2800 questions. The questions are now stored on your browser cache so you can keep playing offline.</br>
-        Each test is made of 24 questions randomly choosen, you must have 75% success to pass.</br>
+      <p>
+        This test contains more than 3000 questions. The questions are now stored on your browser cache so you can keep playing offline.</br>
+        Each test is made of 24 questions randomly chosen, you must have 75% success to pass.<br/>
+        The 'GRIND' mode will generate set of questions you need to practice.<br/>
         Good luck.
       </p>
-      <button class="hide" onclick="startGame()">Start</button>
+      <div class="hide actions">
+        <button onclick="startGame()">Start</button>
+        <button onclick="startGame(true)">GRIND!</button>
+      </div>
     </div>
     <div id="quiz" class="hide">
       <form id="form"></form>
-      <button onclick="nextQuestion()">Next</button>
+      <div class="actions">
+        <button onclick="nextQuestion()">Next</button>
+      </div>
     </div>
     <div id="summary" class="hide">
       <svg viewBox="0 0 100 100">
@@ -122,7 +130,10 @@
         <circle id="summary-circle" cx="50" cy="50" r="46" fill="none" stroke-width="8"/>
       </svg>
       <h1 style="text-align: center;"><span id="summary-result">20</span><small>/24</small></h1>
-      <button onclick="retry()">Re-try</button>
+      <div class="actions">
+        <button onclick="retry()">Re-try</button>
+        <button onclick="retry(true)">GRIND!</button>
+      </div>
     </div>
 
     <script>
@@ -134,7 +145,8 @@
       const summaryCircle = document.getElementById('summary-circle');
       const summaryResult = document.getElementById('summary-result');
       
-      let questionStore;
+      let questionStore = new Map();
+      let questionKeys = [];
       let currentScreen;
       let quizQuestions;
       let quizIndex = 0;
@@ -149,10 +161,8 @@
         currentScreen.style.display = 'inherit';
       }
 
-      function startGame() {
-        const picked = randIndexes(questionStore.length, 24).map(
-          (i) => questionStore[i]
-        );
+      function startGame(badOnes) {
+        const picked = getQuestionSet(badOnes);
         quizIndex = 0;
         quizGoodAnswers = 0;
         quizQuestions = picked;
@@ -161,22 +171,35 @@
         renderQuestion();
       }
 
-      function randIndexes(maxIndex, arrLength) {
-        const output = [];
-        while (output.length < arrLength) {
-          const i = Math.floor(Math.random() * maxIndex);
-          if (!output.includes(i)) {
-            output.push(i);
+      function getQuestionSet(badOnes) {
+        const maxIndex = questionStore.size;
+        const arrLength = 24;
+
+        if (badOnes) {
+          return Array
+            .from(questionStore.values())
+            .sort((a, b) => a.rank - b.rank)
+            .slice(0, 200)
+            .sort(() => Math.random()-.5)
+            .slice(0, 24)
+        } else {
+          const output = [];
+          while (output.length < arrLength) {
+            const i = Math.floor(Math.random() * maxIndex);
+            const question = questionStore.get(questionKeys[i]);
+            if (!output.includes(question)) {
+              output.push(question);
+            }
           }
+          return output;
         }
-        return output;
       }
 
       function renderQuestion() {
         const q = currentQuestion = quizQuestions[quizIndex];
         const pick =
           q.answers.length > 1 ? `data-info="Pick ${q.answers.length}"` : '';
-        const tip = q.tip ? `<p class="tip">${q.tip}</p>` : '';
+        const tip = q.tip ? `<p class="tip">${q.tip.split('\n').join('<br/>')}</p>` : '';
         const ans = q.options
           .map((o, i) => [o, q.answers.includes(i)])
           .map(
@@ -186,8 +209,7 @@
             }"/>
               <span>${a}</span>
             </label>`
-          )
-          .sort(() => Math.random() - 0.5);
+          );
 
         form.innerHTML = `
           <p ${pick}>${q.question}</p>
@@ -232,7 +254,12 @@
       function complete(wasGood) {
         if (wasGood) {
           quizGoodAnswers++;
+          currentQuestion.rank++;
         }
+        else {
+          currentQuestion.rank--;
+        }
+        localStorage.setItem(currentQuestion.id, currentQuestion.rank);
         currentQuestion = null;
         form.classList.add('reveal');
         progress.style.width = `${((quizIndex + 1) / 24) * 100}%`;
@@ -247,10 +274,10 @@
         summaryResult.innerText = quizGoodAnswers;
       }
 
-      function retry () {
+      function retry (badOnes) {
         summaryCircle.style.strokeDashoffset = 289;
         summaryCircle.style.stroke = '#eee';
-        startGame();
+        startGame(badOnes);
       }
 
       // Start
@@ -258,8 +285,12 @@
       fetch('./questions_base.json')
         .then((e) => e.json())
         .then((data) => {
-          questionStore = data;
-          intro.querySelector('button').style.display = 'inherit';
+          data.forEach(q => questionStore.set(q.id, {
+            ...q,
+            rank: parseInt(localStorage[q.id] || '0', 10)
+          }));
+          questionKeys = Array.from(questionStore.keys());
+          intro.querySelector('.actions').classList.remove('hide');
         });
     </script>
     <script>
