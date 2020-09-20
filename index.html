@@ -83,13 +83,24 @@
         margin: 1em auto;
       }
       button {
+        position: relative;
         font-size: 1.5rem;
-        background: #222;
-        border: none;
-        color: #fff;
-        padding: 0.25em 1.5em;
-        margin: .125em 0;
+        color: #000;
+        background: none;
+        border: 4px solid currentColor;
+        border-radius: 6px;
+        box-shadow: 0 2px 0 currentColor;
+        padding: 0.25em 1em;
         font-weight: bold;
+        cursor: pointer;
+      }
+      button:hover {
+        top: -1px;
+        box-shadow: 0 3px 0 currentColor;
+      }
+      button:active {
+        top: 1px;
+        box-shadow: 0 1px 0 currentColor;
       }
 
       .hide {
@@ -107,6 +118,10 @@
         stroke-linecap: round;
         transition: 1s all ease;
       }
+      #summary.fail .summary-success,
+      #summary.success .summary-fail { display: none; }
+      #summary.fail .summary-fail,
+      #summary.success .summary-success { display: inherit; }
     </style>
   </head>
 
@@ -118,15 +133,16 @@
     <div id="intro">
       <h1>Life in the UK.</h1>
       <p>
-        This test contains more than 3000 questions. The questions are now stored on your browser cache so you can keep playing offline.</br>
+        This test contains more than 3000 questions (with tons of duplicates). Everything is stored on your device, so you can keep playing offline.</br>
         Each test is made of 24 questions randomly chosen, you must have 75% success to pass.<br/>
-        The 'GRIND' mode will generate set of questions you need to practice.<br/>
+        The 'Crunch' mode will make you practice questions you previously failed.<br/>
         Good luck.
       </p>
       <div class="hide actions">
         <button onclick="startGame()">Start</button>
-        <button onclick="startGame(true)">GRIND!</button>
+        <button onclick="startGame(true)">Crunch!</button>
       </div>
+      <p class="tip">If you notice any mistakes or weird stuff, please open an issue on <a href="https://github.com/maxwellito/life-in-the-uk/issues/new">GitHub</a> or tweet a screenshot at <a href="https://twitter.com/maxwllt">@mxwllt</a>.</p>
     </div>
     <div id="quiz" class="hide">
       <form id="form"></form>
@@ -143,9 +159,11 @@
         <circle id="summary-circle" cx="50" cy="50" r="46" fill="none" stroke-width="8" stroke-dashoffset="289"/>
       </svg>
       <h1 style="text-align: center;"><span id="summary-result">20</span><small>/24</small></h1>
+      <p class="summary-success">You PASS!<br>You need at least 18 right answers to pass</p>
+      <p class="summary-fail">You FAILED!<br>You need at least 18 right answers to pass</p>
       <div class="actions">
         <button onclick="retry()">Re-try</button>
-        <button onclick="retry(true)">GRIND!</button>
+        <button onclick="retry(true)">Crunch!</button>
       </div>
     </div>
 
@@ -285,6 +303,8 @@
           summaryCircle.style.stroke = quizGoodAnswers >= 18 ? 'green' : 'red';
         }, 10);
         summaryResult.innerText = quizGoodAnswers;
+        summary.className = ''
+        summary.classList.add(quizGoodAnswers >= 18 ? 'success' : 'fail')
       }
 
       function retry (badOnes) {

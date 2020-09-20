@@ -1,5 +1,5 @@
 var APP_NAME = 'lifeintheuk',
-  APP_VERSION = 6,
+  APP_VERSION = 7,
   CACHE_NAME = APP_NAME + '_' + APP_VERSION;
 var filesToCache = ['./', './?utm_source=homescreen', './questions_base.json'];
 
