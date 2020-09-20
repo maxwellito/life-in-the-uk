@@ -27,6 +27,9 @@
         margin: 0 auto;
         max-width: 480px;
       }
+      a {
+        color: inherit;
+      }
       .progress {
         position: relative;
         top: 0;
@@ -106,6 +109,7 @@
       .hide {
         display: none;
       }
+      *:not(.hide) + .while-hidden {display: none;}
       svg {
         display: block;
         max-width: 400px;
@@ -142,7 +146,8 @@
         <button onclick="startGame()">Start</button>
         <button onclick="startGame(true)">Crunch!</button>
       </div>
-      <p class="tip">If you notice any mistakes or weird stuff, please open an issue on <a href="https://github.com/maxwellito/life-in-the-uk/issues/new">GitHub</a> or tweet a screenshot at <a href="https://twitter.com/maxwllt">@mxwllt</a>.</p>
+      <p class="while-hidden actions">Loading...</p>
+      <p class="tip">If you notice any mistakes or weird stuff, please open an issue on <a href="https://github.com/maxwellito/life-in-the-uk/issues/new">GitHub</a> or tweet a screenshot at <a href="https://twitter.com/mxwllt">@mxwllt</a>.</p>
     </div>
     <div id="quiz" class="hide">
       <form id="form"></form>
@@ -159,8 +164,8 @@
         <circle id="summary-circle" cx="50" cy="50" r="46" fill="none" stroke-width="8" stroke-dashoffset="289"/>
       </svg>
       <h1 style="text-align: center;"><span id="summary-result">20</span><small>/24</small></h1>
-      <p class="summary-success">You PASS!<br>You need at least 18 right answers to pass</p>
-      <p class="summary-fail">You FAILED!<br>You need at least 18 right answers to pass</p>
+      <p class="summary-success actions">You PASS!<br>You need at least 18 right answers to pass</p>
+      <p class="summary-fail actions">You FAILED!<br>You need at least 18 right answers to pass</p>
       <div class="actions">
         <button onclick="retry()">Re-try</button>
         <button onclick="retry(true)">Crunch!</button>
